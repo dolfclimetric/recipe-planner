@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weekly Recipe Planner</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; padding: 1em; }
+    .day { border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 6px; }
+    .recipe { margin-bottom: 1em; }
+    .alt { cursor: pointer; color: blue; text-decoration: underline; margin: 0.2em 0; }
+    .alt:hover { color: darkblue; }
+    @media print {
+      button, input, label { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🍽️ Weekly Recipe Planner</h1>
+
+<label for="days">How many days do you want to plan?</label>
+<input type="number" id="days" min="1" max="14" value="5" />
+<button onclick="generatePlan()">Generate Plan</button>
+<button onclick="saveAsPDF()">🖨️ Save as PDF</button>
+
+<div id="plan"></div>
+
+<script>
+  const sheetURL = "https://opensheet.elk.sh/1SziXFwXYN8PLHFV7atz0xZFdALxnBG9d-zPUe6XVZ0s/Blad1";
+  let recipeData = [];
+
+  async function fetchRecipes() {
+    const response = await fetch(sheetURL);
+    recipeData = await response.json();
+  }
+
+  function parseMinutes(str) {
+    if (!str) return null;
+    str = str.toLowerCase().trim();
+
+    let total = 0;
+
+    // Match hours first (e.g., "1 hour", "2 uren")
+    const hourMatch = str.match(/(\d+)\s*(hour|uur|uren)/);
+    if (hourMatch) {
+      total += parseInt(hourMatch[1]) * 60;
+    }
+
+    // Match additional minutes (e.g., "15 min", "30 minuten")
+    const minMatch = str.match(/(\d+)\s*(min|minutes|m|minuten)/);
+    if (minMatch) {
+      total += parseInt(minMatch[1]);
+    }
+
+    // If still nothing matched but contains any digits, fallback
+    if (total === 0) {
+      const digitOnly = str.match(/(\d+)/);
+      if (digitOnly) total = parseInt(digitOnly[1]);
+    }
+
+    return total > 0 ? total : null;
+  }
+
+  function randomFilteredRecipe(maxTime = null) {
+    let filtered = recipeData;
+
+    if (maxTime !== null) {
+      filtered = recipeData.filter(r => {
+        const time = parseMinutes(r["Total Time"]);
+        return time !== null && time <= maxTime;
+      });
+    }
+
+    if (filtered.length === 0) return null;
+    return filtered[Math.floor(Math.random() * filtered.length)];
+  }
+
+  function showRecipe(container, recipe) {
+    const content = container.querySelector('.recipe');
+    const controls = container.querySelector('.controls');
+
+    if (!recipe || !content) {
+      content.innerHTML = `<p style='color:darkorange;'>⚠️ No recipes match your current max cooking time filter.</p>`;
+      if (controls) {
+        const warning = document.createElement("p");
+        warning.style.color = "gray";
+        warning.style.marginTop = "0.5em";
+        warning.innerText = "Try increasing the time limit to see more suggestions.";
+        controls.appendChild(warning);
+      }
+      return;
+    }
+
+    // Restore controls container in case previous error state modified it
+    if (controls) {
+      const existingWarning = controls.querySelector("p");
+      if (existingWarning) existingWarning.remove();
+    }
+
+    content.innerHTML = `
+      <h3>${recipe.Title}</h3>
+      <p><strong>Total Time:</strong> ${recipe["Total Time"]}</p>
+      <p><strong>Tags:</strong> ${recipe.Tags}</p>
+      <a href="${recipe.Url}" target="_blank">🔗 View Recipe</a>
+    `;
+  }
+
+  function showAlternatives(dayIndex, container, maxTime) {
+    const altContainer = document.createElement("div");
+
+    for (let i = 0; i < 5; i++) {
+      const alt = randomFilteredRecipe(maxTime);
+      const link = document.createElement("div");
+      link.className = "alt";
+      link.innerText = alt ? alt.Title : "No recipe";
+      link.onclick = () => {
+        const recipeBox = document.getElementById(`recipe-${dayIndex}`);
+        showRecipe(recipeBox, alt);
+        altContainer.remove();
+      };
+      altContainer.appendChild(link);
+    }
+
+    container.appendChild(altContainer);
+  }
+
+  async function generatePlan() {
+    await fetchRecipes();
+
+    const numDays = parseInt(document.getElementById("days").value);
+    const planDiv = document.getElementById("plan");
+    planDiv.innerHTML = "";
+
+    for (let i = 1; i <= numDays; i++) {
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = `limit-${i}`;
+
+      const label = document.createElement("label");
+      label.innerText = " Set max cooking time? ";
+      label.htmlFor = checkbox.id;
+
+      const timeInput = document.createElement("input");
+      timeInput.type = "number";
+      timeInput.min = 1;
+      timeInput.placeholder = "in minutes";
+      timeInput.style.display = "none";
+      timeInput.id = `time-${i}`;
+
+      checkbox.onchange = () => {
+        timeInput.style.display = checkbox.checked ? "inline" : "none";
+        rerollRecipe(i);
+      };
+
+      const recipeBox = document.createElement("div");
+      recipeBox.id = `recipe-${i}`;
+      const content = document.createElement("div");
+      content.className = "recipe";
+      recipeBox.appendChild(content);
+
+      const controls = document.createElement("div");
+      controls.className = "controls";
+      controls.style.marginTop = "0.5em";
+
+      const altButton = document.createElement("button");
+      altButton.innerText = "Show 5 alternatives";
+      altButton.onclick = () => {
+        const maxTime = checkbox.checked ? parseInt(timeInput.value) : null;
+        showAlternatives(i, dayDiv, maxTime);
+      };
+      controls.appendChild(altButton);
+
+      const timeControls = document.createElement("span");
+      timeControls.style.marginLeft = "1em";
+      timeControls.appendChild(checkbox);
+      timeControls.appendChild(label);
+      timeControls.appendChild(timeInput);
+      controls.appendChild(timeControls);
+
+      recipeBox.appendChild(controls);
+
+
+
+dayDiv.appendChild(recipeBox);
+
+      planDiv.appendChild(dayDiv);
+
+      rerollRecipe(i); // Initial suggestion
+    }
+  }
+
+  function rerollRecipe(i) {
+    const checkbox = document.getElementById(`limit-${i}`);
+    const timeInput = document.getElementById(`time-${i}`);
+    const maxTime = checkbox.checked ? parseInt(timeInput.value) : null;
+    const recipeBox = document.getElementById(`recipe-${i}`);
+    const recipe = randomFilteredRecipe(maxTime);
+    showRecipe(recipeBox, recipe);
+  }
+
+  function saveAsPDF() {
+    const originalTitle = document.title;
+    document.title = "Weekly Recipe Plan";
+    window.print();
+    document.title = originalTitle;
+  }
+</script>
+</body>
+</html>
