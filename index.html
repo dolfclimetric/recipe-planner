@@ -3,6 +3,7 @@
 <head>
   <title>Weekly Recipe Planner</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: sans-serif; padding: 1em; }
 
@@ -54,12 +55,13 @@
     @media (max-width: 600px) {
       .controls-top {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
       }
-      .controls-top label {
+      .controls-top > * {
         width: 100%;
       }
     }
+
 
     @media print {
       button, input, label { display: none !important; }
