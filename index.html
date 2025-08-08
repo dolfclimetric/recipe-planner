@@ -620,6 +620,25 @@
         () => shareContent('recipe', recipe)
       );
       recipeBox.appendChild(shareBtn);
+
+      const addToPlanBtn = createButton(
+        '📋 Generate plan with this recipe',
+        'background: #9b59b6; color: white; margin-top: 0.5em; margin-left: 0.5em; width: auto; max-width: 250px; font-size: 0.9em;',
+        () => {
+          // Set days to 5 and generate plan, then replace first recipe with this one
+          document.getElementById('days').value = '5';
+          generatePlan().then(() => {
+            // Replace the first recipe with the shared one
+            setTimeout(() => {
+              const firstRecipeBox = document.getElementById('recipe-1');
+              if (firstRecipeBox) {
+                showRecipe(firstRecipeBox, recipe);
+              }
+            }, 100);
+          });
+        }
+      );
+      recipeBox.appendChild(addToPlanBtn);
     });
   }
 
@@ -1000,7 +1019,7 @@
       shareRecipeBtn.onclick = () => {
         const recipeElement = document.querySelector(`#recipe-${i} .recipe h3`);
         if (recipeElement) {
-          const currentRecipe = recipeData.find(r => r.Title === recipeElement.textContent);
+          const currentRecipe = STATE.recipeData.find(r => r.Title === recipeElement.textContent);
           if (currentRecipe) {
             shareContent('recipe', currentRecipe);
           }
@@ -1109,8 +1128,337 @@ dayDiv.appendChild(recipeBox);
       const planData = urlParams.get('plan');
       const days = urlParams.get('days') || '5';
       document.getElementById('days').value = days;
-      // Will implement plan loading if needed
+      
+      // Load the shared plan
+      const recipeNames = planData.split(',').map(name => decodeURIComponent(name.trim()));
+      
+      // Debug: Log the recipe names to console
+      console.log('Plan data from URL:', planData);
+      console.log('Decoded recipe names:', recipeNames);
+      console.log('Available recipes count:', STATE.recipeData.length);
+      if (STATE.recipeData.length > 0) {
+        console.log('First few recipe titles:', STATE.recipeData.slice(0, 5).map(r => r.Title));
+      }
+      
+      await loadSharedPlan(recipeNames, parseInt(days));
     }
+    
+    if (urlParams.has('recipe')) {
+      const recipeTitle = decodeURIComponent(urlParams.get('recipe'));
+      console.log('Looking for shared recipe:', recipeTitle);
+      
+      // Wait for recipes to load before searching
+      if (STATE.recipeData.length === 0) {
+        await fetchRecipes();
+      }
+      
+      await loadSharedRecipe(recipeTitle);
+    }
+  }
+
+  // Load shared plan from URL parameters
+  async function loadSharedPlan(recipeNames, numDays) {
+    STATE.usedRecipeIds.clear();
+
+    const planDiv = document.getElementById("plan");
+    planDiv.innerHTML = "";
+
+    // Add share plan button at the top
+    const sharePlanDiv = document.createElement("div");
+    sharePlanDiv.style.cssText = "text-align: center; margin-bottom: 2em;";
+    const sharePlanBtn = document.createElement("button");
+    sharePlanBtn.textContent = "📤 Share this entire plan";
+    sharePlanBtn.style.cssText = "background: #52c41a; font-size: 1.1em; padding: 1em 2em;";
+    sharePlanBtn.onclick = () => {
+      shareContent('plan', recipeNames);
+    };
+    sharePlanDiv.appendChild(sharePlanBtn);
+    planDiv.appendChild(sharePlanDiv);
+
+    // Show notification that plan is being loaded
+    showNotification('Loading shared plan... 🍽️');
+
+    for (let i = 1; i <= numDays; i++) {
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+
+      const recipeBox = document.createElement("div");
+      recipeBox.id = `recipe-${i}`;
+      const content = document.createElement("div");
+      content.className = "recipe";
+      recipeBox.appendChild(content);
+
+      const timeInput = document.createElement("input");
+      timeInput.type = "number";
+      timeInput.min = 1;
+      timeInput.id = `time-${i}`;
+
+      const controls = document.createElement("div");
+      controls.className = "controls";
+      controls.style.marginTop = "0.5em";
+      controls.style.display = "flex";
+      controls.style.flexWrap = "wrap";
+      controls.style.gap = "0.5em";
+      controls.style.alignItems = "center";
+
+      const altButton = document.createElement("button");
+      altButton.innerText = "🔄 Show random alternatives";
+      altButton.style.cssText = "background: #8e44ad; color: white; font-size: 0.9em;";
+      altButton.onclick = () => {
+        showAlternatives(i, dayDiv, null);
+      };
+      controls.appendChild(altButton);
+
+      const searchAltButton = document.createElement("button");
+      searchAltButton.innerHTML = "🔍 Search for alternatives";
+      searchAltButton.style.cssText = "background: #3498db; color: white; font-size: 0.9em;";
+      searchAltButton.onclick = () => {
+        showSearchAlternatives(i, dayDiv);
+      };
+      controls.appendChild(searchAltButton);
+
+      const shareRecipeBtn = document.createElement("button");
+      shareRecipeBtn.innerHTML = "📤 Share";
+      shareRecipeBtn.style.background = "#52c41a";
+      shareRecipeBtn.onclick = () => {
+        const recipeElement = document.querySelector(`#recipe-${i} .recipe h3`);
+        if (recipeElement) {
+          const currentRecipe = STATE.recipeData.find(r => r.Title === recipeElement.textContent);
+          if (currentRecipe) {
+            shareContent('recipe', currentRecipe);
+          }
+        }
+      };
+      controls.appendChild(shareRecipeBtn);
+
+      // Time controls
+      const timeControlsDiv = document.createElement("div");
+      timeControlsDiv.className = "time-controls";
+      timeControlsDiv.style.cssText = "display: none; margin-top: 0.5em; padding: 1em; background: #f4f1f8; border-radius: 8px; border-left: 3px solid #8e44ad;";
+      
+      const timeLabel = document.createElement("label");
+      timeLabel.innerHTML = "⏱️ Max cooking time: ";
+      timeLabel.style.cssText = "font-size: 0.9em; margin-right: 0.5em; color: #8e44ad; font-weight: 500; display: block; margin-bottom: 0.5em;";
+      timeLabel.htmlFor = `time-${i}`;
+      
+      const timeInputContainer = document.createElement("div");
+      timeInputContainer.style.cssText = "display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;";
+      
+      timeInput.style.cssText = "width: 80px; padding: 0.5em; font-size: 0.9em; border: 2px solid #e0e0e0; border-radius: 6px; transition: border-color 0.2s ease;";
+      timeInput.placeholder = "60";
+      timeInput.value = "60";
+      
+      const minutesLabel = document.createElement("span");
+      minutesLabel.textContent = "minutes";
+      minutesLabel.style.cssText = "font-size: 0.9em; color: #666;";
+      
+      const applyTimeButton = document.createElement("button");
+      applyTimeButton.innerHTML = "🎯 Apply Time Filter";
+      applyTimeButton.style.cssText = "background: #8e44ad; color: white; padding: 0.5em 1em; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em; font-weight: 500; transition: all 0.2s ease;";
+      applyTimeButton.onclick = () => {
+        const maxTime = parseInt(timeInput.value);
+        if (maxTime && maxTime > 0) {
+          showAlternatives(i, dayDiv, maxTime);
+        } else {
+          alert("Please enter a valid time in minutes (e.g., 30, 60, 90)");
+        }
+      };
+      
+      applyTimeButton.onmouseenter = () => {
+        applyTimeButton.style.background = "#732d91";
+        applyTimeButton.style.transform = "translateY(-1px)";
+      };
+      
+      applyTimeButton.onmouseleave = () => {
+        applyTimeButton.style.background = "#8e44ad";
+        applyTimeButton.style.transform = "translateY(0)";
+      };
+      
+      timeInput.onfocus = () => {
+        timeInput.style.borderColor = "#8e44ad";
+      };
+      
+      timeInput.onblur = () => {
+        timeInput.style.borderColor = "#e0e0e0";
+      };
+      
+      timeControlsDiv.appendChild(timeLabel);
+      timeInputContainer.appendChild(timeInput);
+      timeInputContainer.appendChild(minutesLabel);
+      timeInputContainer.appendChild(applyTimeButton);
+      timeControlsDiv.appendChild(timeInputContainer);
+
+      recipeBox.appendChild(controls);
+      recipeBox.appendChild(timeControlsDiv);
+      dayDiv.appendChild(recipeBox);
+      planDiv.appendChild(dayDiv);
+
+      // Load the specific recipe for this day
+      if (i <= recipeNames.length) {
+        const recipeName = recipeNames[i - 1];
+        console.log(`Day ${i}: Looking for recipe "${recipeName}"`);
+        
+        const recipe = STATE.recipeData.find(r => r.Title === recipeName);
+        console.log(`Day ${i}: Recipe found:`, recipe ? recipe.Title : 'NOT FOUND');
+        
+        if (recipe) {
+          showRecipe(recipeBox, recipe);
+        } else {
+          // Try a case-insensitive search
+          const recipeCI = STATE.recipeData.find(r => r.Title.toLowerCase() === recipeName.toLowerCase());
+          if (recipeCI) {
+            console.log(`Day ${i}: Found with case-insensitive search:`, recipeCI.Title);
+            showRecipe(recipeBox, recipeCI);
+          } else {
+            // Try a partial match search
+            const recipePartial = STATE.recipeData.find(r => r.Title.includes(recipeName) || recipeName.includes(r.Title));
+            if (recipePartial) {
+              console.log(`Day ${i}: Found with partial match:`, recipePartial.Title);
+              showRecipe(recipeBox, recipePartial);
+            } else {
+              console.log(`Day ${i}: No match found for "${recipeName}"`);
+              console.log('Available titles containing similar words:');
+              const words = recipeName.toLowerCase().split(' ');
+              const similar = STATE.recipeData.filter(r => 
+                words.some(word => r.Title.toLowerCase().includes(word))
+              ).slice(0, 3);
+              console.log(similar.map(r => r.Title));
+              
+              // If recipe not found, show a message
+              content.innerHTML = `
+                <h3 style="color: #e74c3c;">Recipe not found: "${recipeName}"</h3>
+                <p style="color: #7f8c8d;">This recipe might have been removed or renamed in our database.</p>
+                <button onclick="rerollRecipe(${i})" style="background: #3498db; color: white; padding: 0.5em 1em; border: none; border-radius: 6px; cursor: pointer;">
+                  🎲 Get a random recipe instead
+                </button>
+              `;
+            }
+          }
+        }
+      } else {
+        // If there are more days than recipes in the shared plan, generate random ones
+        rerollRecipe(i);
+      }
+    }
+
+    // Show success notification
+    setTimeout(() => {
+      showNotification('Shared plan loaded successfully! 🎉');
+    }, 500);
+  }
+
+  // Load shared recipe from URL parameters
+  async function loadSharedRecipe(recipeTitle) {
+    const planDiv = document.getElementById("plan");
+    planDiv.innerHTML = "";
+
+    // Show notification that recipe is being loaded
+    showNotification('Loading shared recipe... 🍽️');
+
+    // Find the recipe
+    let recipe = STATE.recipeData.find(r => r.Title === recipeTitle);
+    
+    if (!recipe) {
+      // Try case-insensitive search
+      recipe = STATE.recipeData.find(r => r.Title.toLowerCase() === recipeTitle.toLowerCase());
+    }
+    
+    if (!recipe) {
+      // Try partial match search
+      recipe = STATE.recipeData.find(r => r.Title.includes(recipeTitle) || recipeTitle.includes(r.Title));
+    }
+
+    const recipeDiv = document.createElement("div");
+    recipeDiv.className = "day";
+
+    if (recipe) {
+      console.log('Found shared recipe:', recipe.Title);
+      
+      const recipeBox = document.createElement("div");
+      recipeBox.id = "shared-recipe";
+      const content = document.createElement("div");
+      content.className = "recipe";
+      
+      showSearchRecipeContent(content, recipe);
+      recipeBox.appendChild(content);
+
+      // Add share button
+      const shareBtn = createButton(
+        '📤 Share this recipe',
+        'background: #52c41a; margin-top: 0.5em; width: auto; max-width: 200px; font-size: 0.9em;',
+        () => shareContent('recipe', recipe)
+      );
+      recipeBox.appendChild(shareBtn);
+
+      // Add button to generate a plan including this recipe
+      const addToPlanBtn = createButton(
+        '📋 Generate plan with this recipe',
+        'background: #9b59b6; color: white; margin-top: 0.5em; margin-left: 0.5em; width: auto; max-width: 250px; font-size: 0.9em;',
+        () => {
+          // Set days to 5 and generate plan, then replace first recipe with this one
+          document.getElementById('days').value = '5';
+          generatePlan().then(() => {
+            // Replace the first recipe with the shared one
+            setTimeout(() => {
+              const firstRecipeBox = document.getElementById('recipe-1');
+              if (firstRecipeBox) {
+                showRecipe(firstRecipeBox, recipe);
+              }
+            }, 100);
+          });
+        }
+      );
+      recipeBox.appendChild(addToPlanBtn);
+
+      recipeDiv.appendChild(recipeBox);
+      
+      // Show success notification
+      setTimeout(() => {
+        showNotification('Shared recipe loaded successfully! 🎉');
+      }, 500);
+    } else {
+      console.log('Recipe not found:', recipeTitle);
+      
+      // Show recipe not found message with search suggestions
+      recipeDiv.innerHTML = `
+        <h3 style="color: #e74c3c;">Recipe not found: "${recipeTitle}"</h3>
+        <p style="color: #7f8c8d;">This recipe might have been removed or renamed in our database.</p>
+        <div style="margin-top: 1em;">
+          <button onclick="document.getElementById('searchInput').value='${recipeTitle.split(' ').slice(0, 2).join(' ')}'; searchRecipes();" style="background: #3498db; color: white; padding: 0.5em 1em; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5em;">
+            🔍 Search for similar recipes
+          </button>
+          <button onclick="generatePlan()" style="background: #95a5a6; color: white; padding: 0.5em 1em; border: none; border-radius: 6px; cursor: pointer;">
+            📋 Generate random plan instead
+          </button>
+        </div>
+      `;
+      
+      // Try to find similar recipes
+      const words = recipeTitle.toLowerCase().split(' ');
+      const similar = STATE.recipeData.filter(r => 
+        words.some(word => word.length > 2 && r.Title.toLowerCase().includes(word))
+      ).slice(0, 3);
+      
+      if (similar.length > 0) {
+        const suggestionsDiv = document.createElement('div');
+        suggestionsDiv.style.cssText = 'margin-top: 1em; padding: 1em; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #3498db;';
+        suggestionsDiv.innerHTML = '<h4 style="margin-top: 0; color: #3498db;">Did you mean one of these?</h4>';
+        
+        similar.forEach(similarRecipe => {
+          const suggestionBtn = document.createElement('button');
+          suggestionBtn.textContent = similarRecipe.Title;
+          suggestionBtn.style.cssText = 'display: block; width: 100%; margin: 0.3em 0; padding: 0.5em; background: white; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-align: left;';
+          suggestionBtn.onclick = () => {
+            loadSharedRecipe(similarRecipe.Title);
+          };
+          suggestionsDiv.appendChild(suggestionBtn);
+        });
+        
+        recipeDiv.appendChild(suggestionsDiv);
+      }
+    }
+
+    planDiv.appendChild(recipeDiv);
   }
 
   // Sharing and URL Handling Functions
