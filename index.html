@@ -285,7 +285,7 @@
 
 <div class="controls-top">
   <label for="searchInput">🔍 Search for recipes:</label>
-  <input type="text" id="searchInput" placeholder="Enter keywords (e.g. chicken, pasta, quick)" style="flex: 2;" onkeypress="if(event.key==='Enter') searchRecipes()" />
+  <input type="text" id="searchInput" placeholder="Enter keywords in Dutch or English (e.g. kip, chicken, pasta)" style="flex: 2;" onkeypress="if(event.key==='Enter') searchRecipes()" />
   
   <button onclick="searchRecipes()">Search Recipes</button>
   <button onclick="clearSearch()">Clear Results</button>
@@ -314,6 +314,173 @@
     recipeData: [],
     usedRecipeIds: new Set()
   };
+
+  // Synonym groups for multilingual and typo-friendly search
+  const synonymGroups = [
+    ["aardappel", "potato", "potatoes"],
+    ["aardappelen", "potatoes", "potato"],
+    ["aardappels", "potatoes", "potato"],
+    ["aardappelblokjes", "potato cubes", "diced potatoes"],
+    ["aardappelomelet", "potato omelette"],
+    ["aardappelpartjes", "potato wedges"],
+    ["aardappelschijfjes", "potato slices"],
+    ["aardappeltortilla", "potato tortilla"],
+    ["aubergine", "eggplant", "aubergine"],
+    ["kip", "chicken", "hen"],
+    ["kiphapjes", "chicken bites"],
+    ["kipfilet", "chicken breast"],
+    ["rund", "beef"],
+    ["runder", "beef"],
+    ["gehakt", "minced meat", "ground beef", "ground meat"],
+    ["varken", "pork"],
+    ["varkensvlees", "pork"],
+    ["spek", "bacon", "pancetta"],
+    ["ham", "ham"],
+    ["worst", "sausage", "bratwurst", "chorizo"],
+    ["vis", "fish", "seafood"],
+    ["zalm", "salmon"],
+    ["tonijn", "tuna"],
+    ["garnalen", "shrimp", "prawn"],
+    ["kabeljauw", "cod"],
+    ["ei", "egg", "eggs"],
+    ["eieren", "eggs", "egg"],
+    ["ui", "onion", "onions"],
+    ["uien", "onions", "onion"],
+    ["knoflook", "garlic"],
+    ["paprika", "bell pepper", "pepper"],
+    ["paprikareepjes", "bell pepper strips"],
+    ["tomaat", "tomato", "tomatoes"],
+    ["tomaten", "tomatoes", "tomato"],
+    ["cherrytomaatjes", "cherry tomatoes"],
+    ["cherrytomaten", "cherry tomatoes"],
+    ["komkommer", "cucumber"],
+    ["wortel", "carrot", "carrots"],
+    ["courgette", "zucchini", "courgette"],
+    ["bloemkool", "cauliflower"],
+    ["bloemkoolrijst", "cauliflower rice"],
+    ["bloemkoolroosjes", "cauliflower florets"],
+    ["broccoli", "broccoli"],
+    ["spinazie", "spinach"],
+    ["spinaziebladeren", "spinach leaves"],
+    ["sla", "lettuce"],
+    ["sla bladeren", "lettuce leaves"],
+    ["rijst", "rice"],
+    ["zilvervliesrijst", "brown rice"],
+    ["basmatirijst", "basmati rice"],
+    ["pasta", "pasta", "spaghetti", "penne", "fusilli", "macaroni"],
+    ["noedels", "noodles"],
+    ["brood", "bread"],
+    ["broodjes", "bread rolls", "buns"],
+    ["kaas", "cheese", "cheddar", "gouda", "mozzarella", "feta", "parmesan"],
+    ["cheddarkaas", "cheddar cheese"],
+    ["parmezaanse", "parmesan"],
+    ["feta", "feta cheese"],
+    ["melk", "milk"],
+    ["room", "cream", "whipping cream", "double cream"],
+    ["yoghurt", "yogurt"],
+    ["boter", "butter"],
+    ["olie", "oil", "vegetable oil"],
+    ["olijfolie", "olive oil"],
+    ["kokosmelk", "coconut milk"],
+    ["kokosrasp", "desiccated coconut", "shredded coconut"],
+    ["noten", "nuts"],
+    ["amandelen", "almonds"],
+    ["hazelnoten", "hazelnuts"],
+    ["walnoten", "walnuts"],
+    ["pijnboompitten", "pine nuts"],
+    ["bouillon", "stock", "broth"],
+    ["kippenbouillon", "chicken stock", "chicken broth"],
+    ["runderbouillon", "beef stock", "beef broth"],
+    ["groentebouillon", "vegetable stock", "veg stock"],
+    ["tomatenpuree", "tomato paste", "passata"],
+    ["tomatensaus", "tomato sauce", "marinara"],
+    ["basilicum", "basil"],
+    ["peterselie", "parsley"],
+    ["koriander", "coriander", "cilantro"],
+    ["komijn", "cumin"],
+    ["kerrie", "curry powder", "curry"],
+    ["kurkuma", "turmeric"],
+    ["paprikapoeder", "paprika", "smoked paprika"],
+    ["chilipoeder", "chili powder", "chilli powder"],
+    ["chilivlokken", "red pepper flakes", "chili flakes"],
+    ["gember", "ginger"],
+    ["sojasaus", "soy sauce"],
+    ["ketjap", "kecap manis", "ketjap manis"],
+    ["vissaus", "fish sauce"],
+    ["oestersaus", "oyster sauce"],
+    ["azijn", "vinegar"],
+    ["balsamico", "balsamic vinegar"],
+    ["balsamicoazijn", "balsamic vinegar"],
+    ["citroen", "lemon"],
+    ["limoen", "lime"],
+    ["sinaasappel", "orange"],
+    ["suiker", "sugar"],
+    ["bruine suiker", "brown sugar"],
+    ["honing", "honey"],
+    ["zout", "salt"],
+    ["peper", "pepper", "black pepper"],
+    ["bloem", "flour"],
+    ["maizena", "cornstarch", "corn flour"],
+    ["bakpoeder", "baking powder"],
+    ["baksoda", "baking soda"],
+    ["poedersuiker", "icing sugar", "powdered sugar"],
+    ["roomkaas", "cream cheese"],
+    ["crème fraîche", "creme fraiche", "sour cream"],
+    ["augurken", "pickles", "gherkin"],
+    ["erwten", "peas"],
+    ["groenteburger", "veggie burger", "vegetable burger"],
+    ["kappertjes", "capers"],
+    ["kastanjechampignons", "chestnut mushrooms"],
+    ["kruiden", "herbs"],
+    ["lente-ui", "spring onion", "green onion"],
+    ["lenteuitjes", "spring onions", "green onions"],
+    ["linzen", "lentils"],
+    ["mais", "corn", "sweetcorn"],
+    ["mango", "mango"],
+    ["mayonaise", "mayonnaise"],
+    ["ovenschotel", "casserole", "oven dish"],
+    ["pastinaak", "parsnip"],
+    ["prei", "leek"],
+    ["radijs", "radish"],
+    ["rode kool", "red cabbage"],
+    ["rode ui", "red onion"],
+    ["rode uien", "red onions"],
+    ["rozijnen", "raisins"],
+    ["salami", "salami"],
+    ["selderij", "celery"],
+    ["shiitake", "shiitake mushrooms"],
+    ["sperziebonen", "green beans"],
+    ["spruitjes", "brussels sprouts"],
+    ["spruiten", "brussels sprouts"],
+    ["taugé", "bean sprouts"],
+    ["venkel", "fennel"],
+    ["venkelzaad", "fennel seeds"],
+    ["witlof", "chicory", "endive"]
+  ];
+
+  // Create synonym lookup object for fast searching
+  const synonyms = {};
+  synonymGroups.forEach(group => {
+    const lower = group.map(w => w.toLowerCase());
+    lower.forEach(word => { synonyms[word] = lower; });
+  });
+
+  // Smart multilingual recipe matching
+  function matchesRecipe(recipe, searchTerm) {
+    const hay = (
+      (recipe.Title || "") + " " +
+      (recipe.Tags || "") + " " +
+      (recipe.Description || "")
+    ).toLowerCase();
+
+    const term = searchTerm.toLowerCase();
+
+    // Get synonyms for the search term, or use the original term
+    const terms = synonyms[term] || [term];
+
+    // Match on parts of words/expressions as well
+    return terms.some(t => hay.includes(t));
+  }
 
   // API Functions
   async function fetchRecipes() {
@@ -363,15 +530,8 @@
 
   function filterRecipesByKeywords(recipes, keywords) {
     return recipes.filter(recipe => {
-      const title = (recipe.Title || "").toLowerCase();
-      const tags = (recipe.Tags || "").toLowerCase();
-      const description = (recipe.Description || "").toLowerCase();
-      
-      return keywords.some(keyword => 
-        title.includes(keyword) || 
-        tags.includes(keyword) || 
-        description.includes(keyword)
-      );
+      // Use our smart matching function for each keyword
+      return keywords.some(keyword => matchesRecipe(recipe, keyword));
     });
   }
 
