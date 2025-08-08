@@ -5,26 +5,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: sans-serif; padding: 1em; }
-
-    .day {
-      border: 1px solid #ccc;
-      padding: 1em;
-      margin-bottom: 1em;
-      border-radius: 6px;
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      padding: 1em; 
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      margin: 0;
     }
 
-    .recipe { margin-bottom: 1em; }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 2em;
+      font-weight: 300;
+      font-size: 2.5em;
+    }
+
+    .day {
+      border: none;
+      padding: 1.5em;
+      margin-bottom: 1.5em;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .day:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .recipe { 
+      margin-bottom: 1em; 
+    }
+
+    .recipe h3 {
+      color: #2c3e50;
+      margin-bottom: 0.8em;
+      font-size: 1.4em;
+    }
+
+    .recipe img {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
 
     .alt {
       cursor: pointer;
-      color: blue;
-      text-decoration: underline;
-      margin: 0.2em 0;
+      color: #3498db;
+      text-decoration: none;
+      margin: 0.3em 0;
+      padding: 0.5em;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: block;
+      border-left: 3px solid #3498db;
+      background: #f8f9fa;
     }
 
     .alt:hover {
-      color: darkblue;
+      background: #3498db;
+      color: white;
+      transform: translateX(5px);
     }
 
     .controls-top {
@@ -32,39 +75,199 @@
       flex-wrap: wrap;
       gap: 1em;
       align-items: center;
-      margin-bottom: 1.5em;
-      max-width: 600px;
-      justify-content: flex-start;
+      margin-bottom: 2em;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      padding: 1.5em;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-
 
     .controls-top label {
       display: inline-block;
       min-width: 150px;
       text-align: left;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    .controls-top input[type="number"], .controls-top input[type="text"] {
+      padding: 0.5em;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 1em;
+      transition: border-color 0.2s ease;
+    }
+
+    .controls-top input[type="number"]:focus, .controls-top input[type="text"]:focus {
+      outline: none;
+      border-color: #3498db;
     }
 
     .controls-top input[type="number"] {
       width: 60px;
     }
 
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 0.7em 1.2em;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: #2980b9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .controls button {
+      background: #95a5a6;
+      font-size: 0.9em;
+      padding: 0.5em 1em;
+    }
+
+    .controls button:hover {
+      background: #7f8c8d;
+    }
+
     .controls-top > * {
       flex: 1 1 auto;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
+      body {
+        padding: 0.5em;
+      }
+      
       .controls-top {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        padding: 1em;
+        margin-bottom: 1em;
       }
+      
       .controls-top > * {
         width: 100%;
+        margin-bottom: 0.5em;
+      }
+      
+      .controls-top label {
+        min-width: auto;
+        margin-bottom: 0.3em;
+        font-size: 0.9em;
+      }
+      
+      .controls-top input[type="text"] {
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+      
+      .day {
+        padding: 1em;
+        margin-bottom: 1em;
+      }
+      
+      .recipe h3 {
+        font-size: 1.2em;
+        line-height: 1.3;
+      }
+      
+      .recipe img {
+        max-height: 150px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        gap: 0.5em;
+      }
+      
+      .controls button {
+        width: 100%;
+        margin-bottom: 0.5em;
+      }
+      
+      .alt {
+        padding: 0.8em;
+        font-size: 0.9em;
+        margin: 0.2em 0;
+      }
+      
+      h1 {
+        font-size: 1.8em;
+        margin-bottom: 1em;
+      }
+      
+      /* Time controls mobile optimization */
+      .time-controls {
+        padding: 0.8em !important;
+      }
+      
+      .time-controls > div {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.8em !important;
+      }
+      
+      .time-controls input[type="number"] {
+        width: 100% !important;
+        max-width: 120px;
+      }
+      
+      .time-controls button {
+        width: 100% !important;
+        max-width: 200px;
+      }
+      
+      /* Better touch targets */
+      button {
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+      
+      input {
+        min-height: 44px;
+        touch-action: manipulation;
       }
     }
 
+    @media (max-width: 480px) {
+      body {
+        padding: 0.3em;
+      }
+      
+      .controls-top {
+        padding: 0.8em;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      .day {
+        padding: 0.8em;
+      }
+    }
 
     @media print {
       button, input, label { display: none !important; }
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      color: #7f8c8d;
+      font-style: italic;
     }
   </style>
 
@@ -75,48 +278,65 @@
 
 <div class="controls-top">
   <label for="days">How many days do you want to plan?</label>
-  <input type="number" id="days" min="1" max="14" value="5" />
-
-  <label>
-    <input type="checkbox" id="glutenFreeToggle" />
-    Only gluten-free
-  </label>
+  <input type="number" id="days" min="1" max="99" value="5" />
 
   <button onclick="generatePlan()">Generate Plan</button>
-  <button onclick="saveAsPDF()">🖨️ Save as PDF</button>
+</div>
+
+<div class="controls-top">
+  <label for="searchInput">🔍 Search for recipes:</label>
+  <input type="text" id="searchInput" placeholder="Enter keywords (e.g. chicken, pasta, quick)" style="flex: 2;" onkeypress="if(event.key==='Enter') searchRecipes()" />
+  
+  <button onclick="searchRecipes()">Search Recipes</button>
+  <button onclick="clearSearch()">Clear Results</button>
+</div>
+
+<div style="text-align: center; margin-bottom: 2em;">
+  <a href="https://forms.gle/tUiGtM7uf7zQNu5r8" target="_blank" style="color: #7f8c8d; font-size: 0.9em; text-decoration: none; padding: 0.5em; border-radius: 6px; background: rgba(255,255,255,0.7); display: inline-block;">
+    ✍️ Suggest a recipe or report a mistake
+  </a>
 </div>
 
 
 <div id="plan"></div>
 
 <script>
-  const sheetURL = "https://opensheet.elk.sh/1SziXFwXYN8PLHFV7atz0xZFdALxnBG9d-zPUe6XVZ0s/Blad1";
-  let recipeData = [];
+  // Configuration and state
+  const CONFIG = {
+    SHEET_URL: "https://opensheet.elk.sh/1SziXFwXYN8PLHFV7atz0xZFdALxnBG9d-zPUe6XVZ0s/Blad1",
+    MAX_SEARCH_RESULTS: 10,
+    MAX_ALTERNATIVES: 5,
+    MAX_SEARCH_ALTERNATIVES: 8,
+    NOTIFICATION_DURATION: 3000
+  };
 
+  const STATE = {
+    recipeData: [],
+    usedRecipeIds: new Set()
+  };
+
+  // API Functions
   async function fetchRecipes() {
-    const response = await fetch(sheetURL);
-    recipeData = await response.json();
+    const response = await fetch(CONFIG.SHEET_URL);
+    STATE.recipeData = await response.json();
   }
 
+  // Utility Functions
   function parseMinutes(str) {
     if (!str) return null;
     str = str.toLowerCase().trim();
 
     let total = 0;
-
-    // Match hours first (e.g., "1 hour", "2 uren")
     const hourMatch = str.match(/(\d+)\s*(hour|uur|uren)/);
     if (hourMatch) {
       total += parseInt(hourMatch[1]) * 60;
     }
 
-    // Match additional minutes (e.g., "15 min", "30 minuten")
     const minMatch = str.match(/(\d+)\s*(min|minutes|m|minuten)/);
     if (minMatch) {
       total += parseInt(minMatch[1]);
     }
 
-    // If still nothing matched but contains any digits, fallback
     if (total === 0) {
       const digitOnly = str.match(/(\d+)/);
       if (digitOnly) total = parseInt(digitOnly[1]);
@@ -125,20 +345,181 @@
     return total > 0 ? total : null;
   }
 
-  function randomFilteredRecipe(maxTime = null) {
-    let filtered = recipeData;
-
-    if (maxTime !== null) {
-      filtered = recipeData.filter(r => {
-        const time = parseMinutes(r["Total Time"]);
-        return time !== null && time <= maxTime;
-      });
-    }
-
-    if (filtered.length === 0) return null;
-    return filtered[Math.floor(Math.random() * filtered.length)];
+  function createUniqueId(recipe, index) {
+    return `${recipe.Title}-${index}`;
   }
 
+  function getRecipeSource(recipe) {
+    return recipe.Url ? new URL(recipe.Url).hostname.replace('www.', '') : "";
+  }
+
+  function filterRecipesByTime(recipes, maxTime) {
+    if (maxTime === null) return recipes;
+    return recipes.filter(recipe => {
+      const time = parseMinutes(recipe["Total Time"]);
+      return time !== null && time <= maxTime;
+    });
+  }
+
+  function filterRecipesByKeywords(recipes, keywords) {
+    return recipes.filter(recipe => {
+      const title = (recipe.Title || "").toLowerCase();
+      const tags = (recipe.Tags || "").toLowerCase();
+      const description = (recipe.Description || "").toLowerCase();
+      
+      return keywords.some(keyword => 
+        title.includes(keyword) || 
+        tags.includes(keyword) || 
+        description.includes(keyword)
+      );
+    });
+  }
+
+  function getAvailableRecipes(recipes, usedIds) {
+    return recipes.filter((recipe, index) => {
+      const recipeId = createUniqueId(recipe, index);
+      return !usedIds.has(recipeId);
+    });
+  }
+
+  // Recipe Selection Functions
+  function randomFilteredRecipe(maxTime = null) {
+    const filtered = filterRecipesByTime(STATE.recipeData, maxTime);
+    const availableRecipes = getAvailableRecipes(filtered, STATE.usedRecipeIds);
+
+    if (availableRecipes.length === 0) {
+      return null;
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableRecipes.length);
+    const selectedRecipe = availableRecipes[randomIndex];
+    
+    const originalIndex = filtered.indexOf(selectedRecipe);
+    const recipeId = createUniqueId(selectedRecipe, originalIndex);
+    STATE.usedRecipeIds.add(recipeId);
+
+    return selectedRecipe;
+  }
+
+  // UI Creation Functions
+  function createRecipeContent(recipe, isClickableImage = false) {
+    const source = getRecipeSource(recipe);
+    const imageHtml = recipe["Photo Url"] ? 
+      (isClickableImage ? 
+        `<a href="${recipe.Url}" target="_blank"><img src="${recipe["Photo Url"]}" alt="Photo of ${recipe.Title}" style="max-width: 100%; max-height: 200px; margin: 0.5em 0; cursor: pointer; transition: opacity 0.2s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'"></a>` :
+        `<img src="${recipe["Photo Url"]}" alt="Photo of ${recipe.Title}" style="max-width: 100%; max-height: 200px; margin: 0.5em 0;">`) : 
+      "";
+
+    return `
+      <h3>${recipe.Title}</h3>
+      ${imageHtml}
+      <p><strong>Total Time:</strong> ${recipe["Total Time"]}</p>
+      <p><strong>Tags:</strong> ${recipe.Tags}</p>
+      <a href="${recipe.Url}" target="_blank">🔗 View Recipe${source ? ` (source: ${source})` : ""}</a>
+    `;
+  }
+
+  function createAlternativeItem(recipe, color = "#8e44ad") {
+    const link = document.createElement("div");
+    link.className = "alt";
+    link.style.cssText = `
+      cursor: pointer;
+      color: ${color};
+      text-decoration: none;
+      margin: 0.3em 0;
+      padding: 0.8em;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.8em;
+      border-left: 3px solid ${color};
+      background: #ffffff;
+      box-shadow: 0 2px 4px rgba(${color === "#8e44ad" ? "142, 68, 173" : color === "#3498db" ? "52, 152, 219" : "0, 0, 0"}, 0.1);
+    `;
+
+    // Add image or placeholder
+    if (recipe["Photo Url"]) {
+      const img = document.createElement("img");
+      img.src = recipe["Photo Url"];
+      img.alt = recipe.Title;
+      img.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+      `;
+      link.appendChild(img);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        flex-shrink: 0;
+      `;
+      placeholder.textContent = "🍽️";
+      link.appendChild(placeholder);
+    }
+
+    // Add text content
+    const textDiv = document.createElement("div");
+    textDiv.style.flex = "1";
+    
+    const titleSpan = document.createElement("div");
+    titleSpan.textContent = recipe.Title;
+    titleSpan.style.cssText = "font-weight: 500; margin-bottom: 0.2em;";
+    
+    const timeSpan = document.createElement("div");
+    const recipeTime = parseMinutes(recipe["Total Time"]);
+    const timeDisplay = recipeTime ? `${recipeTime} min` : (recipe["Total Time"] || "Time not specified");
+    timeSpan.textContent = timeDisplay;
+    timeSpan.style.cssText = "font-size: 0.8em; color: #666; opacity: 0.8;";
+    
+    const tagsSpan = document.createElement("div");
+    tagsSpan.textContent = recipe.Tags || "No tags";
+    tagsSpan.style.cssText = "font-size: 0.75em; color: #888; opacity: 0.7; margin-top: 0.1em;";
+    
+    textDiv.appendChild(titleSpan);
+    textDiv.appendChild(timeSpan);
+    textDiv.appendChild(tagsSpan);
+    link.appendChild(textDiv);
+
+    // Add hover effects
+    link.onmouseenter = () => {
+      link.style.background = color;
+      link.style.color = "white";
+      link.style.transform = "translateX(5px)";
+      timeSpan.style.color = "rgba(255,255,255,0.8)";
+      tagsSpan.style.color = "rgba(255,255,255,0.7)";
+    };
+    
+    link.onmouseleave = () => {
+      link.style.background = "#ffffff";
+      link.style.color = color;
+      link.style.transform = "translateX(0)";
+      timeSpan.style.color = "#666";
+      tagsSpan.style.color = "#888";
+    };
+
+    return link;
+  }
+
+  function createButton(text, style, onClick) {
+    const button = document.createElement("button");
+    button.innerHTML = text;
+    button.style.cssText = style;
+    button.onclick = onClick;
+    return button;
+  }
+
+  // Recipe Display Functions
   function showRecipe(container, recipe) {
     const content = container.querySelector('.recipe');
     const controls = container.querySelector('.controls');
@@ -161,67 +542,421 @@
       if (existingWarning) existingWarning.remove();
     }
 
-    const source = recipe.Url ? new URL(recipe.Url).hostname.replace('www.', '') : "";
+    showRecipeContent(content, recipe);
+  }
 
-    content.innerHTML = `
-      <h3>${recipe.Title}</h3>
-      ${recipe["Photo Url"] ? `<img src="${recipe["Photo Url"]}" alt="Photo of ${recipe.Title}" style="max-width: 100%; max-height: 200px; margin: 0.5em 0;">` : ""}
-      <p><strong>Total Time:</strong> ${recipe["Total Time"]}</p>
-      <p><strong>Tags:</strong> ${recipe.Tags}</p>
-      <a href="${recipe.Url}" target="_blank">🔗 View Recipe${source ? ` (source: ${source})` : ""}</a>
+  function showRecipeContent(content, recipe) {
+    content.innerHTML = createRecipeContent(recipe, false);
+  }
+
+  function showSearchRecipeContent(content, recipe) {
+    content.innerHTML = createRecipeContent(recipe, true);
+  }
+
+  // Search Functions
+  function searchRecipes() {
+    const searchTerm = document.getElementById("searchInput").value.trim().toLowerCase();
+    
+    if (!searchTerm) {
+      alert("Please enter search keywords");
+      return;
+    }
+
+    if (STATE.recipeData.length === 0) {
+      alert("Please wait, recipes are still loading...");
+      fetchRecipes().then(() => searchRecipes());
+      return;
+    }
+
+    const keywords = searchTerm.split(/\s+/);
+    const searchResults = filterRecipesByKeywords(STATE.recipeData, keywords);
+
+    displaySearchResults(searchResults, searchTerm);
+  }
+
+  function displaySearchResults(results, searchTerm) {
+    const planDiv = document.getElementById("plan");
+    
+    if (results.length === 0) {
+      planDiv.innerHTML = `
+        <div class="day">
+          <h3>🔍 Search Results for "${searchTerm}"</h3>
+          <p style="color: orange;">No recipes found matching your search terms.</p>
+          <p style="color: gray;">Try different keywords or check spelling.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const limitedResults = results.slice(0, CONFIG.MAX_SEARCH_RESULTS);
+    
+    planDiv.innerHTML = `
+      <div class="day">
+        <h3>🔍 Search Results for "${searchTerm}" (${results.length} found, showing first ${limitedResults.length})</h3>
+        <button onclick="shareContent('search', '${searchTerm}')" style="background: #52c41a; margin-top: 0.5em;">
+          📤 Share these search results
+        </button>
+      </div>
     `;
 
+    limitedResults.forEach((recipe, index) => {
+      const resultDiv = document.createElement("div");
+      resultDiv.className = "day";
+      
+      const recipeBox = document.createElement("div");
+      recipeBox.id = `search-result-${index}`;
+      const content = document.createElement("div");
+      content.className = "recipe";
+      recipeBox.appendChild(content);
+
+      resultDiv.appendChild(recipeBox);
+      planDiv.appendChild(resultDiv);
+
+      showSearchRecipeContent(content, recipe);
+      
+      const shareBtn = createButton(
+        '📤 Share this recipe',
+        'background: #52c41a; margin-top: 0.5em; width: auto; max-width: 200px; font-size: 0.9em;',
+        () => shareContent('recipe', recipe)
+      );
+      recipeBox.appendChild(shareBtn);
+    });
+  }
+
+  function clearSearch() {
+    document.getElementById("searchInput").value = "";
+    document.getElementById("plan").innerHTML = "";
+  }
+
+  // Alternative Functions
+  function showSearchAlternatives(dayIndex, container) {
+    // Toggle search controls visibility
+    const searchControls = container.querySelector('.search-alternatives-controls');
+    if (searchControls) {
+      searchControls.style.display = searchControls.style.display === 'none' ? 'block' : 'none';
+      
+      // If hiding, also remove alternatives
+      if (searchControls.style.display === 'none') {
+        const existingAlts = container.querySelector('.search-alternatives-container');
+        if (existingAlts) {
+          existingAlts.remove();
+        }
+        return;
+      }
+    } else {
+      // Create search controls if they don't exist
+      const searchControlsDiv = document.createElement("div");
+      searchControlsDiv.className = "search-alternatives-controls";
+      searchControlsDiv.style.cssText = "margin-top: 0.5em; padding: 1em; background: #f0f8ff; border-radius: 8px; border-left: 3px solid #3498db;";
+      
+      const searchLabel = document.createElement("label");
+      searchLabel.innerHTML = "🔍 Search for specific alternatives: ";
+      searchLabel.style.cssText = "font-size: 0.9em; color: #3498db; font-weight: 500; display: block; margin-bottom: 0.5em;";
+      
+      const searchInputContainer = document.createElement("div");
+      searchInputContainer.style.cssText = "display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;";
+      
+      const searchInput = document.createElement("input");
+      searchInput.type = "text";
+      searchInput.id = `search-alt-${dayIndex}`;
+      searchInput.placeholder = "e.g., chicken, pasta, vegetarian";
+      searchInput.style.cssText = "flex: 1; min-width: 200px; max-width: 300px; padding: 0.5em; font-size: 0.9em; border: 2px solid #e0e0e0; border-radius: 6px; transition: border-color 0.2s ease;";
+      
+      const searchButton = document.createElement("button");
+      searchButton.innerHTML = "🔍 Find Alternatives";
+      searchButton.style.cssText = "background: #3498db; color: white; padding: 0.5em 1em; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em; font-weight: 500; transition: all 0.2s ease;";
+      
+      searchButton.onclick = () => {
+        const searchTerm = searchInput.value.trim();
+        if (!searchTerm) {
+          alert("Please enter search keywords");
+          return;
+        }
+        performSearchAlternatives(dayIndex, container, searchTerm);
+      };
+      
+      // Allow Enter key to trigger search
+      searchInput.onkeypress = (event) => {
+        if (event.key === 'Enter') {
+          searchButton.click();
+        }
+      };
+      
+      searchButton.onmouseenter = () => {
+        searchButton.style.background = "#2980b9";
+        searchButton.style.transform = "translateY(-1px)";
+      };
+      
+      searchButton.onmouseleave = () => {
+        searchButton.style.background = "#3498db";
+        searchButton.style.transform = "translateY(0)";
+      };
+      
+      searchInput.onfocus = () => {
+        searchInput.style.borderColor = "#3498db";
+      };
+      
+      searchInput.onblur = () => {
+        searchInput.style.borderColor = "#e0e0e0";
+      };
+      
+      searchControlsDiv.appendChild(searchLabel);
+      searchInputContainer.appendChild(searchInput);
+      searchInputContainer.appendChild(searchButton);
+      searchControlsDiv.appendChild(searchInputContainer);
+      
+      // Insert after the main controls
+      const controls = container.querySelector('.controls');
+      controls.parentNode.insertBefore(searchControlsDiv, controls.nextSibling);
+    }
+  }
+
+  function performSearchAlternatives(dayIndex, container, searchTerm) {
+    const existingSearchAlts = container.querySelector('.search-alternatives-container');
+    if (existingSearchAlts) {
+      existingSearchAlts.remove();
+    }
+
+    const keywords = searchTerm.toLowerCase().split(/\s+/);
+    const searchResults = filterRecipesByKeywords(STATE.recipeData, keywords);
+
+    const searchAltContainer = document.createElement("div");
+    searchAltContainer.className = "search-alternatives-container";
+    searchAltContainer.style.cssText = `
+      margin-top: 1em;
+      padding: 1em;
+      background: #f0f8ff;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    `;
+    
+    const searchAltTitle = document.createElement("h4");
+    searchAltTitle.innerHTML = `Search results for "${searchTerm}" (${searchResults.length} found):`;
+    searchAltTitle.style.cssText = "margin-top: 0; margin-bottom: 0.8em; color: #3498db; font-size: 1.1em; font-weight: 600;";
+    searchAltContainer.appendChild(searchAltTitle);
+
+    if (searchResults.length === 0) {
+      const noResultsMsg = document.createElement("div");
+      noResultsMsg.style.cssText = `
+        padding: 1em;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        color: #856404;
+      `;
+      noResultsMsg.innerHTML = `
+        <strong>🔍 No recipes found!</strong><br>
+        No recipes match your search terms.<br>
+        <small>Try different keywords or check spelling.</small>
+      `;
+      searchAltContainer.appendChild(noResultsMsg);
+      container.appendChild(searchAltContainer);
+      return;
+    }
+
+    const limitedResults = searchResults.slice(0, CONFIG.MAX_SEARCH_ALTERNATIVES);
+    
+    limitedResults.forEach((recipe, index) => {
+      const link = createAlternativeItem(recipe, "#3498db");
+      
+      link.onclick = () => {
+        const recipeBox = document.getElementById(`recipe-${dayIndex}`);
+        showRecipe(recipeBox, recipe);
+        searchAltContainer.remove();
+        
+        const searchControls = container.querySelector('.search-alternatives-controls');
+        if (searchControls) searchControls.style.display = 'none';
+      };
+      
+      searchAltContainer.appendChild(link);
+    });
+
+    if (searchResults.length > CONFIG.MAX_SEARCH_ALTERNATIVES) {
+      const moreResults = document.createElement("div");
+      moreResults.style.cssText = `
+        margin-top: 0.5em;
+        padding: 0.5em;
+        background: #e3f2fd;
+        border-radius: 4px;
+        font-size: 0.8em;
+        color: #1976d2;
+        text-align: center;
+      `;
+      moreResults.innerHTML = `... and ${searchResults.length - CONFIG.MAX_SEARCH_ALTERNATIVES} more recipes found. Try more specific keywords to narrow down results.`;
+      searchAltContainer.appendChild(moreResults);
+    }
+
+    container.appendChild(searchAltContainer);
   }
 
   function showAlternatives(dayIndex, container, maxTime) {
+    // If maxTime is provided, we're applying a filter - don't toggle, just update alternatives
+    const isApplyingFilter = maxTime !== null;
+    
+    const timeControls = container.querySelector('.time-controls');
+    
+    if (!isApplyingFilter) {
+      // Only toggle time controls visibility when clicking main "Show alternatives" button
+      if (timeControls) {
+        timeControls.style.display = timeControls.style.display === 'none' ? 'block' : 'none';
+      }
+    } else {
+      // When applying filter, ensure time controls stay visible
+      if (timeControls) {
+        timeControls.style.display = 'block';
+      }
+    }
+    
+    // Remove any existing alternatives first
+    const existingAlts = container.querySelector('.alternatives-container');
+    if (existingAlts) {
+      existingAlts.remove();
+    }
+    
+    // If we're just hiding (not applying filter) and time controls are now hidden, exit
+    if (!isApplyingFilter && timeControls && timeControls.style.display === 'none') {
+      return;
+    }
+    
+    // Use the provided maxTime parameter (from time filter button) or null for unlimited
+    const actualMaxTime = maxTime;
+    
     const altContainer = document.createElement("div");
+    altContainer.className = "alternatives-container";
+    altContainer.style.cssText = `
+      margin-top: 1em;
+      padding: 1em;
+      background: #f4f1f8;
+      border-radius: 8px;
+      border-left: 4px solid #8e44ad;
+    `;
+    
+    const altTitle = document.createElement("h4");
+    if (actualMaxTime !== null) {
+      altTitle.innerHTML = `Alternative recipes (≤ ${actualMaxTime} min):`;
+      altTitle.style.cssText = "margin-top: 0; margin-bottom: 0.8em; color: #8e44ad; font-size: 1.1em; font-weight: 600;";
+    } else {
+      altTitle.textContent = "Alternative recipes:";
+      altTitle.style.cssText = "margin-top: 0; margin-bottom: 0.8em; color: #8e44ad; font-size: 1.1em; font-weight: 600;";
+    }
+    altContainer.appendChild(altTitle);
 
-    for (let i = 0; i < 5; i++) {
-      const alt = randomFilteredRecipe(maxTime);
-      const link = document.createElement("div");
-      link.className = "alt";
-      link.innerText = alt ? alt.Title : "No recipe";
-      link.onclick = () => {
-        const recipeBox = document.getElementById(`recipe-${dayIndex}`);
-        showRecipe(recipeBox, alt);
-        altContainer.remove();
-      };
-      altContainer.appendChild(link);
+    const filtered = filterRecipesByTime(STATE.recipeData, actualMaxTime);
+    
+    if (actualMaxTime !== null && filtered.length === 0) {
+      const noRecipesMsg = document.createElement("div");
+      noRecipesMsg.style.cssText = `
+        padding: 1em;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        color: #856404;
+        margin-bottom: 0.5em;
+      `;
+      noRecipesMsg.innerHTML = `
+        <strong>⚠️ No recipes found!</strong><br>
+        No recipes available with cooking time ≤ ${actualMaxTime} minutes.<br>
+        <small>Try increasing the time limit or browse without time filter.</small>
+      `;
+      altContainer.appendChild(noRecipesMsg);
+      container.appendChild(altContainer);
+      return;
+    }
+
+    let foundAlternatives = 0;
+    const tempUsedIds = new Set();
+    const maxAttempts = Math.min(filtered.length, 100);
+    
+    for (let i = 0; i < maxAttempts && foundAlternatives < CONFIG.MAX_ALTERNATIVES; i++) {
+      const availableForAlts = getAvailableRecipes(filtered, tempUsedIds);
+      
+      if (availableForAlts.length === 0) break;
+      
+      const randomIndex = Math.floor(Math.random() * availableForAlts.length);
+      const alt = availableForAlts[randomIndex];
+      
+      if (alt) {
+        const originalIndex = filtered.indexOf(alt);
+        tempUsedIds.add(createUniqueId(alt, originalIndex));
+        
+        const link = createAlternativeItem(alt, "#8e44ad");
+        
+        link.onclick = () => {
+          const recipeBox = document.getElementById(`recipe-${dayIndex}`);
+          showRecipe(recipeBox, alt);
+          altContainer.remove();
+          if (timeControls) timeControls.style.display = 'none';
+        };
+        
+        altContainer.appendChild(link);
+        foundAlternatives++;
+      }
+    }
+    
+    if (foundAlternatives === 0 && filtered.length > 0) {
+      const noAlts = document.createElement("p");
+      const timeMsg = actualMaxTime ? ` with max ${actualMaxTime} minutes cooking time` : "";
+      noAlts.innerHTML = `
+        <span style="color: #7f8c8d;">No more unique alternatives available${timeMsg}.</span><br>
+        <small style="color: #95a5a6;">Found ${filtered.length} total recipes matching your criteria.</small>
+      `;
+      altContainer.appendChild(noAlts);
+    }
+    
+    // Add helpful info about time filtering
+    if (actualMaxTime !== null && foundAlternatives > 0) {
+      const filterInfo = document.createElement("div");
+      filterInfo.style.cssText = `
+        margin-top: 0.5em;
+        padding: 0.5em;
+        background: #e8f5e8;
+        border-radius: 4px;
+        font-size: 0.8em;
+        color: #2d5a2d;
+        border-left: 3px solid #4caf50;
+      `;
+      filterInfo.innerHTML = `
+        🎯 Showing recipes with cooking time ≤ ${actualMaxTime} minutes 
+        (${filtered.length} total recipes match this filter)
+      `;
+      altContainer.appendChild(filterInfo);
     }
 
     container.appendChild(altContainer);
   }
 
+  // Plan Generation Functions
   async function generatePlan() {
     await fetchRecipes();
+    
+    STATE.usedRecipeIds.clear();
 
     const numDays = parseInt(document.getElementById("days").value);
     const planDiv = document.getElementById("plan");
     planDiv.innerHTML = "";
 
+    // Add share plan button at the top
+    const sharePlanDiv = document.createElement("div");
+    sharePlanDiv.style.cssText = "text-align: center; margin-bottom: 2em;";
+    const sharePlanBtn = document.createElement("button");
+    sharePlanBtn.textContent = "📤 Share this entire plan";
+    sharePlanBtn.style.cssText = "background: #52c41a; font-size: 1.1em; padding: 1em 2em;";
+    sharePlanBtn.onclick = () => {
+      const planTitles = [];
+      for (let j = 1; j <= numDays; j++) {
+        const recipeElement = document.querySelector(`#recipe-${j} .recipe h3`);
+        if (recipeElement) {
+          planTitles.push(recipeElement.textContent);
+        }
+      }
+      shareContent('plan', planTitles);
+    };
+    sharePlanDiv.appendChild(sharePlanBtn);
+    planDiv.appendChild(sharePlanDiv);
+
     for (let i = 1; i <= numDays; i++) {
       const dayDiv = document.createElement("div");
       dayDiv.className = "day";
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.id = `limit-${i}`;
-
-      const label = document.createElement("label");
-      label.innerText = " Set max cooking time? ";
-      label.htmlFor = checkbox.id;
-
-      const timeInput = document.createElement("input");
-      timeInput.type = "number";
-      timeInput.min = 1;
-      timeInput.placeholder = "in minutes";
-      timeInput.style.display = "none";
-      timeInput.id = `time-${i}`;
-
-      checkbox.onchange = () => {
-        timeInput.style.display = checkbox.checked ? "inline" : "none";
-        rerollRecipe(i);
-      };
 
       const recipeBox = document.createElement("div");
       recipeBox.id = `recipe-${i}`;
@@ -229,26 +964,109 @@
       content.className = "recipe";
       recipeBox.appendChild(content);
 
+      const timeInput = document.createElement("input");
+      timeInput.type = "number";
+      timeInput.min = 1;
+      timeInput.id = `time-${i}`;
+
       const controls = document.createElement("div");
       controls.className = "controls";
       controls.style.marginTop = "0.5em";
+      controls.style.display = "flex";
+      controls.style.flexWrap = "wrap";
+      controls.style.gap = "0.5em";
+      controls.style.alignItems = "center";
 
       const altButton = document.createElement("button");
-      altButton.innerText = "Show 5 alternatives";
+      altButton.innerText = "🔄 Show random alternatives";
+      altButton.style.cssText = "background: #8e44ad; color: white; font-size: 0.9em;";
       altButton.onclick = () => {
-        const maxTime = checkbox.checked ? parseInt(timeInput.value) : null;
-        showAlternatives(i, dayDiv, maxTime);
+        showAlternatives(i, dayDiv, null); // No maxTime for main button click
       };
       controls.appendChild(altButton);
 
-      const timeControls = document.createElement("span");
-      timeControls.style.marginLeft = "1em";
-      timeControls.appendChild(checkbox);
-      timeControls.appendChild(label);
-      timeControls.appendChild(timeInput);
-      controls.appendChild(timeControls);
+      // Add search for alternatives button
+      const searchAltButton = document.createElement("button");
+      searchAltButton.innerHTML = "🔍 Search for alternatives";
+      searchAltButton.style.cssText = "background: #3498db; color: white; font-size: 0.9em;";
+      searchAltButton.onclick = () => {
+        showSearchAlternatives(i, dayDiv);
+      };
+      controls.appendChild(searchAltButton);
+
+      const shareRecipeBtn = document.createElement("button");
+      shareRecipeBtn.innerHTML = "📤 Share";
+      shareRecipeBtn.style.background = "#52c41a";
+      shareRecipeBtn.onclick = () => {
+        const recipeElement = document.querySelector(`#recipe-${i} .recipe h3`);
+        if (recipeElement) {
+          const currentRecipe = recipeData.find(r => r.Title === recipeElement.textContent);
+          if (currentRecipe) {
+            shareContent('recipe', currentRecipe);
+          }
+        }
+      };
+      controls.appendChild(shareRecipeBtn);
+
+      // Move time controls to separate div that shows only when alternatives are visible
+      const timeControlsDiv = document.createElement("div");
+      timeControlsDiv.className = "time-controls";
+      timeControlsDiv.style.cssText = "display: none; margin-top: 0.5em; padding: 1em; background: #f4f1f8; border-radius: 8px; border-left: 3px solid #8e44ad;";
+      
+      const timeLabel = document.createElement("label");
+      timeLabel.innerHTML = "⏱️ Max cooking time: ";
+      timeLabel.style.cssText = "font-size: 0.9em; margin-right: 0.5em; color: #8e44ad; font-weight: 500; display: block; margin-bottom: 0.5em;";
+      timeLabel.htmlFor = `time-${i}`;
+      
+      const timeInputContainer = document.createElement("div");
+      timeInputContainer.style.cssText = "display: flex; align-items: center; gap: 0.5em; flex-wrap: wrap;";
+      
+      timeInput.style.cssText = "width: 80px; padding: 0.5em; font-size: 0.9em; border: 2px solid #e0e0e0; border-radius: 6px; transition: border-color 0.2s ease;";
+      timeInput.placeholder = "60";
+      timeInput.value = "60";
+      
+      const minutesLabel = document.createElement("span");
+      minutesLabel.textContent = "minutes";
+      minutesLabel.style.cssText = "font-size: 0.9em; color: #666;";
+      
+      const applyTimeButton = document.createElement("button");
+      applyTimeButton.innerHTML = "🎯 Apply Time Filter";
+      applyTimeButton.style.cssText = "background: #8e44ad; color: white; padding: 0.5em 1em; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em; font-weight: 500; transition: all 0.2s ease;";
+      applyTimeButton.onclick = () => {
+        const maxTime = parseInt(timeInput.value);
+        if (maxTime && maxTime > 0) {
+          showAlternatives(i, dayDiv, maxTime);
+        } else {
+          alert("Please enter a valid time in minutes (e.g., 30, 60, 90)");
+        }
+      };
+      
+      applyTimeButton.onmouseenter = () => {
+        applyTimeButton.style.background = "#732d91";
+        applyTimeButton.style.transform = "translateY(-1px)";
+      };
+      
+      applyTimeButton.onmouseleave = () => {
+        applyTimeButton.style.background = "#8e44ad";
+        applyTimeButton.style.transform = "translateY(0)";
+      };
+      
+      timeInput.onfocus = () => {
+        timeInput.style.borderColor = "#8e44ad";
+      };
+      
+      timeInput.onblur = () => {
+        timeInput.style.borderColor = "#e0e0e0";
+      };
+      
+      timeControlsDiv.appendChild(timeLabel);
+      timeInputContainer.appendChild(timeInput);
+      timeInputContainer.appendChild(minutesLabel);
+      timeInputContainer.appendChild(applyTimeButton);
+      timeControlsDiv.appendChild(timeInputContainer);
 
       recipeBox.appendChild(controls);
+      recipeBox.appendChild(timeControlsDiv);
 
 
 
@@ -261,19 +1079,88 @@ dayDiv.appendChild(recipeBox);
   }
 
   function rerollRecipe(i) {
-    const checkbox = document.getElementById(`limit-${i}`);
-    const timeInput = document.getElementById(`time-${i}`);
-    const maxTime = checkbox.checked ? parseInt(timeInput.value) : null;
     const recipeBox = document.getElementById(`recipe-${i}`);
-    const recipe = randomFilteredRecipe(maxTime);
+    const recipe = randomFilteredRecipe(null); // No time filtering for main recipe generation
     showRecipe(recipeBox, recipe);
   }
 
-  function saveAsPDF() {
-    const originalTitle = document.title;
-    document.title = "Weekly Recipe Plan";
-    window.print();
-    document.title = originalTitle;
+  // Event Handlers and Initialization
+  window.addEventListener('DOMContentLoaded', function() {
+    fetchRecipes();
+    handleSharedContent();
+  });
+
+  // Handle shared content from URL parameters
+  function handleSharedContent() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('search')) {
+      const searchTerm = urlParams.get('search');
+      document.getElementById('searchInput').value = searchTerm;
+      setTimeout(() => searchRecipes(), 100); // Wait for recipes to load
+    }
+    
+    if (urlParams.has('plan')) {
+      const planData = urlParams.get('plan');
+      const days = urlParams.get('days') || '5';
+      document.getElementById('days').value = days;
+      // Will implement plan loading if needed
+    }
+  }
+
+  // Sharing and URL Handling Functions
+  async function shareContent(type, data) {
+    const baseUrl = window.location.origin + window.location.pathname;
+    let shareUrl = '';
+    
+    switch(type) {
+      case 'search':
+        shareUrl = `${baseUrl}?search=${encodeURIComponent(data)}`;
+        break;
+      case 'recipe':
+        shareUrl = `${baseUrl}?recipe=${encodeURIComponent(data.Title)}`;
+        break;
+      case 'plan':
+        const days = document.getElementById('days').value;
+        shareUrl = `${baseUrl}?plan=${encodeURIComponent(data.join(','))}&days=${days}`;
+        break;
+    }
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showNotification('Link copied to clipboard! 📋');
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      showNotification('Link copied to clipboard! 📋');
+    }
+  }
+
+  function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2ecc71;
+      color: white;
+      padding: 1em 1.5em;
+      border-radius: 6px;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      font-weight: 500;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, CONFIG.NOTIFICATION_DURATION);
   }
 </script>
 </body>
